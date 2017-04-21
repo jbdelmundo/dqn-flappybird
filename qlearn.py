@@ -175,7 +175,7 @@ def trainNetwork(model,args):
         t = t + 1
 
         # save progress every 10000 iterations
-        if t % 1000 == 0:
+        if t % 10000 == 0:
             print("Now we save model")
             model.save_weights("model.h5", overwrite=True)
             model.save_weights("model-"+str(t)+".h5", overwrite=True)
