@@ -23,6 +23,12 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD , Adam
 import tensorflow as tf
 
+# load the logging module
+import logging
+
+# customize the log message format
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%Y%m%d%H%M%S',level=logging.DEBUG)
+
 GAME = 'bird' # the name of the game being played for log files
 CONFIG = 'nothreshold'
 ACTIONS = 2 # number of valid actions
@@ -191,9 +197,11 @@ def trainNetwork(model,args):
         else:
             state = "train"
 
-        print("TIMESTEP", t, "/ STATE", state, \
+        if t % 1000 == 0:
+            logging.debug("TIMESTEP", t, "/ STATE", state, \
             "/ EPSILON", epsilon, "/ ACTION", action_index, "/ REWARD", r_t, \
             "/ Q_MAX " , np.max(Q_sa), "/ Loss ", loss)
+
         if t == MAX_TIMESTEPS:
             break;
     print("Episode finished!")
