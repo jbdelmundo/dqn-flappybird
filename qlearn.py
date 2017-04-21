@@ -184,7 +184,7 @@ def trainNetwork(model,args):
         if t % 10000 == 0:
             print("Now we save model")
             model.save_weights("model.h5", overwrite=True)
-            model.save_weights("model-"+str(t)+".h5", overwrite=True)
+            model.save_weights("./checkpoints/model-"+str(t)+".h5", overwrite=True)
             with open("model.json", "w") as outfile:
                 json.dump(model.to_json(), outfile)
 
