@@ -25,6 +25,9 @@ import tensorflow as tf
 
 # load the logging module
 import logging
+import os
+
+os.environ["SDL_VIDEODRIVER"] = "x11"
 
 # customize the log message format
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%Y%m%d%H%M%S',level=logging.DEBUG)
