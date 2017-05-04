@@ -23,24 +23,14 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD , Adam
 import tensorflow as tf
 
-# load the logging module
-import logging
-import os
-
-os.environ["SDL_VIDEODRIVER"] = "x11"
-
-# customize the log message format
-logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%Y%m%d%H%M%S',level=logging.DEBUG)
-
 GAME = 'bird' # the name of the game being played for log files
 CONFIG = 'nothreshold'
 ACTIONS = 2 # number of valid actions
 GAMMA = 0.99 # decay rate of past observations
-OBSERVATION = 3200. # timesteps to observe before training
-EXPLORE = 3000000. # frames over which to anneal epsilon
-MAX_TIMESTEPS = 5000000
+OBSERVATION = 5200. # timesteps to observe before training
+EXPLORE = 4000000. # frames over which to anneal epsilon
 FINAL_EPSILON = 0.0001 # final value of epsilon
-INITIAL_EPSILON = 0.1 # starting value of epsilon
+INITIAL_EPSILON = 0.8 # starting value of epsilon
 REPLAY_MEMORY = 50000 # number of previous transitions to remember
 BATCH = 32 # size of minibatch
 FRAME_PER_ACTION = 1
@@ -93,18 +83,14 @@ def trainNetwork(model,args):
 
     
 
-    if args['mode'] == 'Run' or args['mode'] == 'Train':
-        if args['mode'] == 'Run':
-            OBSERVE = 999999999    #We keep observe, never train
-            epsilon = FINAL_EPSILON
-        else:                       #We go to training mode
-            OBSERVE = OBSERVATION
-            epsilon = INITIAL_EPSILON
+    if args['mode'] == 'Run':
+        OBSERVE = 999999999    #We keep observe, never train
+        epsilon = FINAL_EPSILON
         print ("Now we load weight")
         model.load_weights("model.h5")
         adam = Adam(lr=LEARNING_RATE)
         model.compile(loss='mse',optimizer=adam)
-        print ("Weight load successfully")
+        print ("Weight load successfully")    
     else:                       #We go to training mode
         OBSERVE = OBSERVATION
         epsilon = INITIAL_EPSILON
@@ -116,6 +102,7 @@ def trainNetwork(model,args):
         action_index = 0
         r_t = 0
         a_t = np.zeros([ACTIONS])
+        
         #choose an action epsilon greedy
         if t % FRAME_PER_ACTION == 0:
             if random.random() <= epsilon:
@@ -127,8 +114,10 @@ def trainNetwork(model,args):
                 max_Q = np.argmax(q)
                 action_index = max_Q
                 a_t[max_Q] = 1
+        else:
+            a_t[0] = 1
 
-        #We reduced the epsilon gradually
+		#We reduced the epsilon gradually
         if epsilon > FINAL_EPSILON and t > OBSERVE:
             epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
 
@@ -184,10 +173,10 @@ def trainNetwork(model,args):
         t = t + 1
 
         # save progress every 10000 iterations
-        if t % 10000 == 0:
+        if t % 1000 == 0:
             print("Now we save model")
+            model.save_weights("model-"+str(t)+".h5", overwrite=True)
             model.save_weights("model.h5", overwrite=True)
-            model.save_weights("./checkpoints/model-"+str(t)+".h5", overwrite=True)
             with open("model.json", "w") as outfile:
                 json.dump(model.to_json(), outfile)
 
@@ -200,13 +189,10 @@ def trainNetwork(model,args):
         else:
             state = "train"
 
-        if t % 1000 == 0:
-            logging.debug("TIMESTEP", t, "/ STATE", state, \
+        print("TIMESTEP", t, "/ STATE", state, \
             "/ EPSILON", epsilon, "/ ACTION", action_index, "/ REWARD", r_t, \
             "/ Q_MAX " , np.max(Q_sa), "/ Loss ", loss)
 
-        if t == MAX_TIMESTEPS:
-            break;
     print("Episode finished!")
     print("************************")
 

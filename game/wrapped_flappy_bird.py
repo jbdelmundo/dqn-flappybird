@@ -13,8 +13,8 @@ SCREENHEIGHT = 512
 
 pygame.init()
 FPSCLOCK = pygame.time.Clock()
-SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))          
-pygame.display.set_caption('Flappy Bird')
+SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+pygame.display.set_caption('Benj\'s Flappy Bird')
 
 IMAGES, SOUNDS, HITMASKS = flappy_bird_utils.load()
 PIPEGAPSIZE = 100 # gap between upper and lower part of pipe
@@ -139,15 +139,16 @@ class GameState:
                     (self.playerx, self.playery))
 
         image_data = pygame.surfarray.array3d(pygame.display.get_surface())
-        #pygame.display.update()
+        pygame.display.update()
         #print ("FPS" , FPSCLOCK.get_fps())
-        #FPSCLOCK.tick(FPS)
+        FPSCLOCK.tick(FPS)
         #print self.upperPipes[0]['y'] + PIPE_HEIGHT - int(BASEY * 0.2)
         return image_data, reward, terminal
 
 def getRandomPipe():
     """returns a randomly generated pipe"""
     # y of gap between upper and lower pipe
+    #gapYs = [20,  100,140]
     gapYs = [20, 30, 40, 50, 60, 70, 80, 90]
     index = random.randint(0, len(gapYs)-1)
     gapY = gapYs[index]
